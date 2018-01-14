@@ -72,7 +72,7 @@ var App = (function() {
            ADD NEW DATA ANIMATION
         -------------------------- */
 
-      addNewdata();
+      var addNewdata = new AddData();
 
       /* ----------------------- 
           RESIZE EVENT
@@ -446,29 +446,37 @@ var App = (function() {
   /* ----------------------- 
     ADD NEW DATA ANIMATED
    -------------------------- */
-  var elapsed, then = moment();
+  class AddData {
+    constructor() {
+      this.elapsed, this.then = moment();
+      this.addNewdata();
+    }
 
-  function addNewdata() {
+    addNewdata() {
 
-    window.requestAnimationFrame(addNewdata);
+      window.requestAnimationFrame(this.addNewdata.bind(this));
 
-    var nowAnimate = moment();
-    elapsed = nowAnimate - then;
+      var nowAnimate = moment();
+      this.elapsed = nowAnimate - this.then;
 
-    if (elapsed > timeInterval_ms) {
-      then = nowAnimate - (elapsed % timeInterval_ms);
+      if (this.elapsed > timeInterval_ms) {
+        this.then = nowAnimate - (this.elapsed % timeInterval_ms);
 
-      actualTemp = Math.round(getRnd(maxTemp, minTemp));
+        actualTemp = Math.round(getRnd(maxTemp, minTemp));
 
-      data.push({
-        time: now.add(timeInterval_ms / 1000, 's').toDate(),
-        temperature: actualTemp
-      });
+        data.push({
+          time: now.add(timeInterval_ms / 1000, 's').toDate(),
+          temperature: actualTemp
+        });
 
-      lineChart.updateLineChart();
+        lineChart.updateLineChart();
 
+      }
     }
   }
+
+
+
 
   /* ----------------------- 
     AUXILIARY FUNCTION
