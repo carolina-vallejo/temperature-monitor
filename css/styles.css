@@ -242,7 +242,7 @@ line,
   background: rgba(255, 255, 255, 0.9);
   max-width: 300px;
   top: 50%;
-  left: 50%;
+  left: calc(50% + 15px);
   padding: 20px;
   font-size: 0.9em;
   color: #b8bfcc;
@@ -250,6 +250,9 @@ line,
   -ms-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%); }
+  @media only screen and (max-width: 768px) {
+    .messages {
+      font-size: 0.8em; } }
   .messages.hide {
     display: none; }
 

@@ -97,11 +97,14 @@ line,
   background: rgba(white, 0.9);
   max-width: 300px;
   top: 50%;
-  left: 50%;
+  left: calc(50% + 15px);
   padding: 20px;
   font-size: 0.9em;
   color: lighten($base-color, 30%);
   @include transform(translate(-50%, -50%));
+  @include mediaquery('max',   768px) {
+   font-size: 0.8em;
+  }   
   &.hide {
     display: none;
   }
