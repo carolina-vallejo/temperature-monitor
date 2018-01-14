@@ -234,7 +234,6 @@ var App = (function() {
         .style("stroke-width", function() {
           return data.length === 1 ? '3px' : '1px';
         })
-
     }
 
     configGrid() {
@@ -314,12 +313,12 @@ var App = (function() {
     }
     interval_ui(element) {
 
-      //--- SELECT INTERNAL UI ELEMENT
+      //--- SELECT UI SUBELEMENTS
       var valueElement = element.select('.value');
       var minusElement = element.select('.minus');
       var plusElement = element.select('.plus');
 
-      //--- WRITE ACTUAL VALUE OF INTERVAL
+      //--- WRITE ACTUAL VALUE
       valueElement
         .text((timeInterval_ms / 1000) + '"');
 
@@ -353,8 +352,7 @@ var App = (function() {
     }
     minTemp_ui(element) {
 
-      //--- SELECT INTERNAL UI ELEMENT
-
+      //--- SELECT UI SUBELEMENTS
       var valueElement = element.select('.value');
       var minusElement = element.select('.minus');
       var plusElement = element.select('.plus');
@@ -396,9 +394,10 @@ var App = (function() {
 
         });
     }
+
     maxTemp_ui(element) {
 
-      //--- SELECT INTERNAL UI ELEMENT
+      //--- SELECT UI SUBELEMENTS
       var valueElement = element.select('.value');
       var minusElement = element.select('.minus');
       var plusElement = element.select('.plus');
@@ -462,13 +461,15 @@ var App = (function() {
       if (this.elapsed > timeInterval_ms) {
         this.then = nowAnimate - (this.elapsed % timeInterval_ms);
 
+        //--- ADD RANDOM DATA
         actualTemp = Math.round(getRnd(maxTemp, minTemp));
-
+        
         data.push({
           time: now.add(timeInterval_ms / 1000, 's').toDate(),
           temperature: actualTemp
         });
 
+        //--- UPDATE DATA
         lineChart.updateLineChart();
 
       }
