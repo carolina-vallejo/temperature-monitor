@@ -1,6 +1,6 @@
 ## Description
 
-This repository is a response to a front-end challenge for a job application at Snuk. 
+This repository is the answer to a front-end challenge for a job application at Snuk. 
 
 The task consist in build a temperature control that shows the last 30 minutes of Berlin weather data in a linear chart. This interactive chart also include controls that allow the user change the temperature range and also the frequency in which the data is being updated.
 
