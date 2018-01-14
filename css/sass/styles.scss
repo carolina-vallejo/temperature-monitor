@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,700');
+@import 'functions';
+@import 'normalize';
+
+//--- COLORS
+
+$base-color: desaturate(#576d94, 10%);
+$primary-color: #4fe4d7;
+
+/*--- GENERALS ---*/
+
+body {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: 100%;
+  @include smoothfonts;
+  background: #f1f1f1;
+  color: $base-color;
+  font-weight: 300;
+  @include userselectnone;
+}
+
+
+/*------ LINE CHART -----*/
+
+.container {
+  background: #fff;
+  padding: 5%;
+  box-sizing: border-box;
+  text-align: center;
+  max-width: 1000px;
+  width: 90%;
+  margin: 2% auto;
+  border-radius: 10px;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chart {
+  position: relative;
+  width: 100%;
+  height: 300px;
+}
+
+.grid {
+  opacity: 0.09;
+}
+
+.axis {
+  opacity: 0.8;
+}
+
+.tick {
+  transition: transform 300ms ease;
+}
+
+.path {
+  stroke: $primary-color;
+  fill: none;
+  stroke-width: 1px;
+  stroke-opacity: 0.9;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+text {
+  font-size: 1.3em;
+  fill: $base-color;
+  @include mediaquery('max', 768px) {
+    font-size: 1.1em;
+  }
+}
+
+line,
+.domain {
+  stroke: $base-color;
+}
+
+.hide {
+  opacity: 0.3;
+}
+
+
+/*------ TEXT -----*/
+
+.title {
+  font-size: 1.2em;
+  margin: 0 0 20px 0;
+  font-weight: 300;
+  text-transform: uppercase;
+  color: $base-color;
+  @include mediaquery('max', 768px) {
+    margin-top: 20px;
+  }
+}
+
+.messages {
+  position: absolute;
+  background: rgba(white, 0.9);
+  max-width: 300px;
+  top: 50%;
+  left: 50%;
+  padding: 20px;
+  font-size: 0.9em;
+  color: lighten($base-color, 30%);
+  @include transform(translate(-50%, -50%));
+  &.hide {
+    display: none;
+  }
+}
+
+.actual-temp {
+  margin: 30px 0;
+  @include clearfix;
+  .value {
+    font-size: 3em;
+    display: block;
+    color: $primary-color;
+  }
+  .label {
+    text-transform: uppercase;
+  }
+}
+
+
+/*------ CONTROLS -----*/
+
+.controls {
+  @include flex;
+  background: lighten($base-color, 50%);
+  border-radius: 10px;
+  margin-top: 20px;
+  &>* {
+    width: (100% / 3);
+    box-sizing: border-box;
+    padding: 20px 80px;
+    position: relative;
+    border: 1px solid #fff;
+    @include mediaquery('max',   768px) {
+      width: 100%;
+    }
+  }
+  .minus,
+  .plus {
+    position: absolute;
+    display: block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-shadow: none;
+    box-shadow: none;
+    width: 34px;
+    height: 34px;
+    font-weight: 400;
+    font-size: 0;
+    border-radius: 3px;
+    background: none;
+    border: 1px solid $primary-color;
+    color: #fff;
+    background: $primary-color;
+    cursor: pointer;
+    top: 50%;
+    @include transform(translate(0, -50%));
+    box-shadow: 1px 1px 0 0px rgba($base-color, 0.1);
+    &:after {
+      display: block;
+    }
+    &:focus {
+      outline: 0;
+      background: darken($primary-color, 10%);
+    }
+  }
+  .plus {
+    right: 30px;
+    &:after {
+      margin-top: -1px;
+      font-size: 26px;
+      content: "+";
+    }
+  }
+  .minus {
+    left: 30px;
+    &:after {
+      margin-top: -1px;
+      content: "-";
+      font-size: 26px;
+    }
+  }
+  .value {
+    display: block;
+    font-size: 1.6em;
+  }
+  .label {
+    font-size: 0.7em;
+    text-transform: uppercase;
+  }
+}

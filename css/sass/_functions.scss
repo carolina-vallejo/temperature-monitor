@@ -1,0 +1,73 @@
+@mixin flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  -ms-flex-line-pack: stretch;
+  align-content: stretch;
+}
+//-- FONT SMOOTH
+@mixin smoothfonts {
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -o-font-smoothing: antialiased;
+}
+
+@mixin shadow{
+  box-shadow: 1px 2px 20px 2px rgba(0, 0, 0, 0.15);
+}
+
+//-- TRANSFOR
+@mixin transform($transform) {
+  -webkit-transform: $transform;
+  -ms-transform: $transform;
+  -moz-transform: $transform;
+  transform: $transform;
+}
+@mixin userselectnone {
+  -webkit-user-select: none;
+  /* Chrome, Opera, Safari */
+  -moz-user-select: none;
+  /* Firefox 2+ */
+  -ms-user-select: none;
+  /* IE 10+ */
+  user-select: none;
+  /* Standard syntax */
+}
+
+//-- QUERIES
+@mixin mediaquery($max, $width) {
+  @media only screen and (unquote( $max + '-width: ' + $width)) {
+    @content;
+  }
+}
+
+@mixin mediaquery_h($max, $height) {
+  @media only screen and (unquote( $max + '-height: ' + $height)) {
+    @content;
+  }
+}
+
+//-- CLEARFIX
+@mixin clearfix {
+  &::after,
+  &::before {
+    content: "";
+    display: table;
+  }
+  &::after {
+    clear: both;
+  }
+}
