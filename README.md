@@ -2,11 +2,11 @@
 
 This repository is the answer to a front-end challenge for a job application at Snuk. 
 
-The task consist in build a temperature control that shows the last 30 minutes of Berlin weather data in a linear chart. This interactive chart also include controls that allow the user change the temperature range and also the frequency in which the data is being updated.
+The task consist in build a temperature control that shows the last 30 minutes of Berlin weather data in a linear chart. This temperature also include controls that allow the user change the temperature range and also the frequency in which the data is being updated.
 
 ## Technical decisions
 
-I decided to work with D3 library because this library allows create  an interactive linear chart in SVG that can be customizable in a very low level.
+I decided to work with D3 library because this library allows create an interactive linear chart in SVG that can be customizable in a very low level.
 
 For time operations a used moment.js because makes things easier.
 

@@ -260,10 +260,16 @@ line,
     display: table; }
   .actual-temp::after {
     clear: both; }
+  @media only screen and (max-width: 768px) {
+    .actual-temp {
+      margin: 20px 0; } }
   .actual-temp .value {
     font-size: 3em;
     display: block;
     color: #4fe4d7; }
+    @media only screen and (max-width: 768px) {
+      .actual-temp .value {
+        font-size: 2.5em; } }
   .actual-temp .label {
     text-transform: uppercase; }
 
@@ -297,7 +303,8 @@ line,
     border: 1px solid #fff; }
     @media only screen and (max-width: 768px) {
       .controls > * {
-        width: 100%; } }
+        width: 100%;
+        padding: 10px 80px; } }
   .controls .minus,
   .controls .plus {
     position: absolute;

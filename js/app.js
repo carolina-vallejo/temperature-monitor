@@ -59,8 +59,7 @@ var App = (function() {
        -------------------------- */
 
       lineChart = new LineChart({
-        element: document.getElementById('chart'),
-        data: data
+        element: document.getElementById('chart')
       });
 
       /* ----------------------- 
@@ -101,345 +100,349 @@ var App = (function() {
     LINE CHART
    -------------------------- */
 
-  var LineChart = function(opts) {
+  class LineChart {
 
-    // LOAD ARGUMENTS 
-    this.data = opts.data;
-    this.element = opts.element;
+    constructor(opts) {
+      // LOAD ARGUMENT
+      this.element = opts.element;
 
-    // CREATE CHART
-    this.draw();
-  }
+      // CREATE CHART
+      this.draw();
+    }
+    draw() {
 
-  LineChart.prototype.draw = function() {
+      //-- DEFINE WIDTH, HEIGHT
+      this.svgWidth = this.element.offsetWidth;
+      this.svgHeight = 300;
 
-    //-- DEFINE WIDTH, HEIGHT
-    this.svgWidth = this.element.offsetWidth;
-    this.svgHeight = 300;
-    //---MARGIN
-    this.m = {
-      top: 20,
-      right: 20,
-      bottom: 30,
-      left: 50
-    };
+      //---MARGIN
+      this.m = {
+        top: 20,
+        right: 20,
+        bottom: 30,
+        left: 50
+      };
 
-    this.width = this.svgWidth - this.m.left - this.m.right;
-    this.height = this.svgHeight - this.m.top - this.m.bottom;
+      this.width = this.svgWidth - this.m.left - this.m.right;
+      this.height = this.svgHeight - this.m.top - this.m.bottom;
 
-    //-- CREATE SVG
-    this.svg = d3.select(this.element).append('svg')
-      .attr('width', this.svgWidth)
-      .attr('height', this.svgHeight);
+      //-- CREATE SVG
+      this.svg = d3.select(this.element).append('svg')
+        .attr('width', this.svgWidth)
+        .attr('height', this.svgHeight);
 
-    //-- CREATE CONTAINER
-    this.container = this.svg.append('g')
-      .attr('transform', 'translate(' + this.m.left + ',' + this.m.top + ')');
-
-
-    //-- DEFINE SCALE FUNCTIONS
-    this.scaleX = d3.scaleTime();
-    //--- SCALE Y FUNCTION
-    this.scaleY = d3.scaleLinear();
-    //-- DEFINE LINE FUNCTION   
-    this.lineFunc = d3.line();
+      //-- CREATE CONTAINER
+      this.container = this.svg.append('g')
+        .attr('transform', 'translate(' + this.m.left + ',' + this.m.top + ')');
 
 
-    //-- CREATE AXES OBJECTS
-    this.axisX = this.container.append('g')
-      .attr('class', 'axis');
-    this.axisY = this.container.append('g')
-      .attr('class', 'axis');
+      //-- DEFINE SCALE FUNCTIONS
+      this.scaleX = d3.scaleTime();
+      //--- SCALE Y FUNCTION
+      this.scaleY = d3.scaleLinear();
+      //-- DEFINE LINE FUNCTION   
+      this.lineFunc = d3.line();
 
-    //-- CREATE CLIP PATH
-    this.clippath = this.container.append('clipPath')
-      .attr('id', 'clip')
-      .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height);
 
-    //--- CREATE PATH
-    this.path = this.container.append('path')
-      .attr('class', 'path')
-      .attr('clip-path', 'url(#clip)')
-      .style("stroke-width", '3');
+      //-- CREATE AXES OBJECTS
+      this.axisX = this.container.append('g')
+        .attr('class', 'axis');
+      this.axisY = this.container.append('g')
+        .attr('class', 'axis');
 
-    //--- CREATE GRID X LINES
-    this.gridX = this.svg.append('g')
-      .attr('class', 'grid');
+      //-- CREATE CLIP PATH
+      this.clippath = this.container.append('clipPath')
+        .attr('id', 'clip')
+        .append('rect')
+        .attr('width', this.width)
+        .attr('height', this.height);
 
-    //--- CREATE GRID Y LINES
-    this.gridY = this.svg.append('g')
-      .attr('class', 'grid');
+      //--- CREATE PATH
+      this.path = this.container.append('path')
+        .attr('class', 'path')
+        .attr('clip-path', 'url(#clip)')
+        .style("stroke-width", '3');
 
-    this.actualTempLabel = d3.select('.actual-temp')
-      .select('.value')
-      .text(actualTemp + '°');
+      //--- CREATE GRID X LINES
+      this.gridX = this.svg.append('g')
+        .attr('class', 'grid');
 
-    //-- INIT SCALES, AXES, GRID, PATH
-    this.updateLineChart();
+      //--- CREATE GRID Y LINES
+      this.gridY = this.svg.append('g')
+        .attr('class', 'grid');
 
-  }
+      this.actualTempLabel = d3.select('.actual-temp')
+        .select('.value')
+        .text(actualTemp + '°');
 
-  LineChart.prototype.configScales = function() {
+      //-- INIT SCALES, AXES, GRID, PATH
+      this.updateLineChart();
 
-    //--- RANGE: NOW UNTIL LAST 30 MINS.
-    var moment1 = moment().subtract(rangeTime_ms, 'ms').toDate();
-    var moment2 = moment().toDate();
+    }
 
-    this.scaleX
-      .domain([moment1, moment2])
-      .rangeRound([0, this.width]);
+    configScales() {
 
-    //--- SCALE Y FUNCTION
-    this.scaleY
-      .domain([minTemp, maxTemp])
-      .rangeRound([this.height, 0]);
+      //--- RANGE: NOW UNTIL LAST 30 MINS.
+      var moment1 = moment().subtract(rangeTime_ms, 'ms').toDate();
+      var moment2 = moment().toDate();
 
-  }
+      this.scaleX
+        .domain([moment1, moment2])
+        .rangeRound([0, this.width]);
 
-  LineChart.prototype.configAxes = function() {
-    //--- CREATE X AXIS TIMES
-    this.axisX
-      .attr('transform', 'translate(0,' + this.height + ')')
-      .call(
-        d3.axisBottom(this.scaleX)
-      )
-    //--- CREATE Y AXIS 
-    this.axisY
-      .call(
-        d3.axisLeft(this.scaleY)
-        .ticks(5)
-        .tickFormat(function(d, i) {
-          return d + '°'
+      //--- SCALE Y FUNCTION
+      this.scaleY
+        .domain([minTemp, maxTemp])
+        .rangeRound([this.height, 0]);
+
+    }
+
+    configAxes() {
+      //--- CREATE X AXIS TIMES
+      this.axisX
+        .attr('transform', 'translate(0,' + this.height + ')')
+        .call(
+          d3.axisBottom(this.scaleX)
+        )
+      //--- CREATE Y AXIS 
+      this.axisY
+        .call(
+          d3.axisLeft(this.scaleY)
+          .ticks(5)
+          .tickFormat(function(d, i) {
+            return d + '°'
+          })
+        );
+    }
+
+    configPath() {
+      var _this = this;
+
+      this.lineFunc
+        .x(function(d) {
+          return _this.scaleX(d.time);
         })
-      );
-  }
+        .y(function(d) {
+          return _this.scaleY(d.temperature);
+        });
 
-  LineChart.prototype.configPath = function() {
-    var _this = this;
+      //--- CREATE PATH
+      this.path
+        .datum(data)
+        .transition()
+        .attr("d", this.lineFunc)
+        .style("stroke-width", function() {
+          return data.length === 1 ? '3px' : '1px';
+        })
 
-    this.lineFunc
-      .x(function(d) {
-        return _this.scaleX(d.time);
-      })
-      .y(function(d) {
-        return _this.scaleY(d.temperature);
-      });
+    }
 
-    //--- CREATE PATH
-    this.path
-      .datum(data)
-      .transition()
-      .attr("d", this.lineFunc)
-      .style("stroke-width", function() {
-        return data.length === 1 ? '3px' : '1px';
-      })
+    configGrid() {
+      var _this = this;
+      //--- CREATE GRID X LINES
+      this.gridX
+        .attr('transform', 'translate(' + this.m.left + ',' + (this.height + this.m.top) + ')')
+        .call(
+          d3.axisBottom(_this.scaleX)
+          .ticks(5)
+          .tickSize(-_this.height)
+          .tickFormat('')
+        );
 
-  }
+      //--- CREATE GRID Y LINES
+      this.gridY
+        .attr('transform', 'translate(' + this.m.left + ',' + this.m.top + ')')
+        .call(
+          d3.axisLeft(_this.scaleY)
+          .ticks(5)
+          .tickSize(-_this.width)
+          .tickFormat('')
+        );
+    }
 
-  LineChart.prototype.configGrid = function() {
-    var _this = this;
-    //--- CREATE GRID X LINES
-    this.gridX
-      .attr('transform', 'translate(' + this.m.left + ',' + (this.height + this.m.top) + ')')
-      .call(
-        d3.axisBottom(_this.scaleX)
-        .ticks(5)
-        .tickSize(-_this.height)
-        .tickFormat('')
-      );
+    updateTextLabel() {
+      this.actualTempLabel
+        .text(actualTemp + '°');
+    }
 
-    //--- CREATE GRID Y LINES
-    this.gridY
-      .attr('transform', 'translate(' + this.m.left + ',' + this.m.top + ')')
-      .call(
-        d3.axisLeft(_this.scaleY)
-        .ticks(5)
-        .tickSize(-_this.width)
-        .tickFormat('')
-      );
-  }
+    updateLineChart() {
 
-  LineChart.prototype.updateTextLabel = function() {
-    this.actualTempLabel
-      .text(actualTemp + '°');
-  }
+      //-- INIT SCALES, AXES, GRID, PATH
+      this.configScales();
+      this.configAxes();
+      this.configPath();
+      this.configGrid();
+      this.updateTextLabel();
 
-  LineChart.prototype.updateLineChart = function() {
+      //---HIDE/SHOW MESSAGE OUT OF RANGE
+      if (actualTemp < minTemp || actualTemp > maxTemp) {
+        message_ui
+          .classed('hide', false)
+          .text('The current temperature is out of range, try changing the settings');
+      } else {
+        message_ui
+          .classed('hide', true);
+      }
+    }
 
-    //-- INIT SCALES, AXES, GRID, PATH
-    this.configScales();
-    this.configAxes();
-    this.configPath();
-    this.configGrid();
-    this.updateTextLabel();
+    resizeLineChart() {
+      //-- UPDATE WIDTH
+      this.svgWidth = this.element.offsetWidth;
+      this.width = this.svgWidth - this.m.left - this.m.right;
 
-    //---HIDE/SHOW MESSAGE OUT OF RANGE
-    if (actualTemp < minTemp || actualTemp > maxTemp) {
-      message_ui
-        .classed('hide', false)
-        .text('The current temperature is out of range, try changing the settings');
-    } else {
-      message_ui
-        .classed('hide', true);
+      this.svg
+        .attr('width', this.svgWidth);
+
+      this.clippath
+        .attr('width', this.width);
+
+      this.updateLineChart();
+
     }
   }
 
-  LineChart.prototype.resizeLineChart = function() {
-    //-- UPDATE WIDTH
-    this.svgWidth = this.element.offsetWidth;
-    this.width = this.svgWidth - this.m.left - this.m.right;
-
-    this.svg
-      .attr('width', this.svgWidth);
-
-    this.clippath
-      .attr('width', this.width);
-
-    this.updateLineChart();
-
-  }
   /* ----------------------- 
     UI BUTTONS
    -------------------------- */
 
-  var UiButtons = function() {
+  class UiButtons {
 
-    this.interval_ui(d3.select('#interval'));
-    this.minTemp_ui(d3.select('#min-temp'));
-    this.maxTemp_ui(d3.select('#max-temp'));
+    constructor() {
+      this.interval_ui(d3.select('#interval'));
+      this.minTemp_ui(d3.select('#min-temp'));
+      this.maxTemp_ui(d3.select('#max-temp'));
+    }
+    interval_ui(element) {
 
+      //--- SELECT INTERNAL UI ELEMENT
+      var valueElement = element.select('.value');
+      var minusElement = element.select('.minus');
+      var plusElement = element.select('.plus');
+
+      //--- WRITE ACTUAL VALUE OF INTERVAL
+      valueElement
+        .text((timeInterval_ms / 1000) + '"');
+
+      //--- ON CLICK EVENTS
+      minusElement
+        .on('click', function() {
+
+          if (timeInterval_ms > 1000) {
+            timeInterval_ms -= 1000;
+          } else {
+            d3.select(this)
+              .classed('hide', true);
+          }
+
+          valueElement
+            .text((timeInterval_ms / 1000) + '"');
+
+        });
+
+      plusElement
+        .on('click', function() {
+
+          minusElement.classed('hide', false);
+
+          timeInterval_ms += 1000;
+
+          valueElement
+            .text((timeInterval_ms / 1000) + '"');
+
+        });
+    }
+    minTemp_ui(element) {
+
+      //--- SELECT INTERNAL UI ELEMENT
+
+      var valueElement = element.select('.value');
+      var minusElement = element.select('.minus');
+      var plusElement = element.select('.plus');
+
+      //--- WRITE ACTUAL VALUE OF INTERVAL
+      valueElement
+        .text(minTemp + '°');
+
+      //--- ON CLICK EVENTS
+      minusElement
+        .on('click', function() {
+
+          plusElement
+            .classed('hide', false);
+
+          minTemp -= 1;
+
+          valueElement
+            .text(minTemp + '°');
+
+          lineChart.updateLineChart();
+
+        });
+
+      plusElement
+        .on('click', function() {
+
+          if (minTemp + 1 < maxTemp) {
+            minTemp += 1;
+          } else {
+            d3.select(this)
+              .classed('hide', true);
+          }
+
+          valueElement
+            .text(minTemp + '°');
+
+          lineChart.updateLineChart();
+
+        });
+    }
+    maxTemp_ui(element) {
+
+      //--- SELECT INTERNAL UI ELEMENT
+      var valueElement = element.select('.value');
+      var minusElement = element.select('.minus');
+      var plusElement = element.select('.plus');
+
+      //--- WRITE ACTUAL VALUE OF INTERVAL
+      valueElement
+        .text(maxTemp + '°');
+
+      //--- ON CLICK EVENTS
+      minusElement
+        .on('click', function() {
+
+          if (maxTemp > minTemp + 1) {
+            maxTemp -= 1;
+          } else {
+            d3.select(this)
+              .classed('hide', true);
+          }
+
+          valueElement
+            .text(maxTemp + '°');
+
+          lineChart.updateLineChart();
+
+        });
+
+      plusElement
+        .on('click', function() {
+
+          minusElement
+            .classed('hide', false);
+
+          maxTemp += 1;
+
+          valueElement
+            .text(maxTemp + '°');
+
+          lineChart.updateLineChart();
+
+        });
+    }
   }
 
-  UiButtons.prototype.interval_ui = function(element) {
 
-    //--- SELECT INTERNAL UI ELEMENT
-    var valueElement = element.select('.value');
-    var minusElement = element.select('.minus');
-    var plusElement = element.select('.plus');
-
-    //--- WRITE ACTUAL VALUE OF INTERVAL
-    valueElement
-      .text((timeInterval_ms / 1000) + '"');
-
-    //--- ON CLICK EVENTS
-    minusElement
-      .on('click', function() {
-
-        if (timeInterval_ms > 1000) {
-          timeInterval_ms -= 1000;
-        } else {
-          d3.select(this)
-            .classed('hide', true);
-        }
-
-        valueElement
-          .text((timeInterval_ms / 1000) + '"');
-
-      });
-
-    plusElement
-      .on('click', function() {
-
-        minusElement.classed('hide', false);
-
-        timeInterval_ms += 1000;
-
-        valueElement
-          .text((timeInterval_ms / 1000) + '"');
-
-      });
-  }
-  UiButtons.prototype.minTemp_ui = function(element) {
-
-    //--- SELECT INTERNAL UI ELEMENT
-
-    var valueElement = element.select('.value');
-    var minusElement = element.select('.minus');
-    var plusElement = element.select('.plus');
-
-    //--- WRITE ACTUAL VALUE OF INTERVAL
-    valueElement
-      .text(minTemp + '°');
-
-    //--- ON CLICK EVENTS
-    minusElement
-      .on('click', function() {
-
-        plusElement
-          .classed('hide', false);
-
-        minTemp -= 1;
-
-        valueElement
-          .text(minTemp + '°');
-
-        lineChart.updateLineChart();
-
-      });
-
-    plusElement
-      .on('click', function() {
-
-        if (minTemp + 1 < maxTemp) {
-          minTemp += 1;
-        } else {
-          d3.select(this)
-            .classed('hide', true);
-        }
-
-        valueElement
-          .text(minTemp + '°');
-
-        lineChart.updateLineChart();
-
-      });
-  }
-  UiButtons.prototype.maxTemp_ui = function(element) {
-
-    //--- SELECT INTERNAL UI ELEMENT
-    var valueElement = element.select('.value');
-    var minusElement = element.select('.minus');
-    var plusElement = element.select('.plus');
-
-    //--- WRITE ACTUAL VALUE OF INTERVAL
-    valueElement
-      .text(maxTemp + '°');
-
-    //--- ON CLICK EVENTS
-    minusElement
-      .on('click', function() {
-
-        if (maxTemp > minTemp + 1) {
-          maxTemp -= 1;
-        } else {
-          d3.select(this)
-            .classed('hide', true);
-        }
-
-        valueElement
-          .text(maxTemp + '°');
-
-        lineChart.updateLineChart();
-
-      });
-
-    plusElement
-      .on('click', function() {
-
-        minusElement
-          .classed('hide', false);
-
-        maxTemp += 1;
-
-        valueElement
-          .text(maxTemp + '°');
-
-        lineChart.updateLineChart();
-
-      });
-  }
   /* ----------------------- 
     ADD NEW DATA ANIMATED
    -------------------------- */
